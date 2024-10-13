@@ -1,45 +1,25 @@
 <?php
 session_start();
-include '../inc/database.php'; // Đảm bảo đường dẫn đúng
 
-// Kiểm tra xem người dùng đã đăng nhập chưa
-if (!isset($_SESSION['MaND'])) {
-    echo "Bạn cần đăng nhập để xóa sản phẩm.";
-    exit();
+// Kiểm tra xem giỏ hàng có sản phẩm không
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = array();
 }
 
-// Kiểm tra nếu có sản phẩm để xóa
+// Kiểm tra nếu có tham số MaSP trong URL
 if (isset($_GET['MaSP'])) {
-    $MaSP = $_GET['MaSP'];
-    $MaND = $_SESSION['MaND'];
+    $product_id = $_GET['MaSP'];
 
-    // Giảm số lượng sản phẩm
-    $check_sql = "SELECT SoLuong FROM giohang WHERE MaSP = $MaSP AND MaND = $MaND";
-    $check_result = mysqli_query($conn, $check_sql);
-    $row = mysqli_fetch_assoc($check_result);
-    
-    if ($row) {
-        $new_quantity = $row['SoLuong'] - 1;
-
-        if ($new_quantity > 0) {
-            // Cập nhật số lượng nếu còn lại
-            $update_sql = "UPDATE giohang SET SoLuong = $new_quantity WHERE MaSP = $MaSP AND MaND = $MaND";
-            mysqli_query($conn, $update_sql);
-
-            // Cập nhật giỏ hàng trong session
-            $_SESSION['cart'][$MaSP] = $new_quantity; // Cập nhật số lượng trong session
-        } else {
-            // Xóa sản phẩm nếu số lượng bằng 0
-            $delete_sql = "DELETE FROM giohang WHERE MaSP = $MaSP AND MaND = $MaND";
-            mysqli_query($conn, $delete_sql);
-
-            // Xóa khỏi giỏ hàng trong session
-            unset($_SESSION['cart'][$MaSP]); // Xóa sản phẩm khỏi session
+    // Tìm và xóa sản phẩm trong giỏ hàng
+    foreach ($_SESSION['cart'] as $key => $item) {
+        if ($item['MaSP'] === $product_id) {
+            unset($_SESSION['cart'][$key]); // Xóa sản phẩm
+            break; // Dừng vòng lặp khi đã tìm thấy sản phẩm
         }
     }
+}
 
-    // Chuyển hướng về trang giỏ hàng
-    header("Location: cart.php");
-    exit();
-} 
+// Chuyển hướng về trang giỏ hàng
+header("Location: cart.php");
+exit();
 ?>

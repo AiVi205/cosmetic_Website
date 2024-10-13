@@ -142,14 +142,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
                             <!-- // Trong file header.php hoặc file bất kỳ có giỏ hàng -->
                             <?php
-                            $total_quantity = 0; // Khởi tạo biến đếm số lượng
+                            // $total_quantity = 0; // Khởi tạo biến đếm số lượng
                             
                             // Đếm số lượng sản phẩm trong giỏ hàng
-                            if (isset($_SESSION['cart'])) {
-                                foreach ($_SESSION['cart'] as $quantity) {
-                                    $total_quantity += $quantity; // Cộng dồn số lượng
-                                }
-                            }
+                            // if (isset($_SESSION['cart'])) {
+                            //     foreach ($_SESSION['cart'] as $quantity) {
+                            //         $total_quantity += $quantity; // Cộng dồn số lượng
+                            //     }
+                            // }
                             ?>
 
                             <!-- Hiển thị số lượng trong icon giỏ hàng -->
@@ -157,7 +157,8 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <i class="fas fa-shopping-cart text-primary"></i>
                                 <span class="badge text-secondary border border-secondary rounded-circle"
                                     style="padding-bottom: 2px;">
-                                    <?php echo $total_quantity; ?> <!-- Hiển thị số lượng giỏ hàng -->
+                                    <?php 
+                                    //echo $total_quantity; ?> <!-- Hiển thị số lượng giỏ hàng -->
                                 </span>
                             </a>
 

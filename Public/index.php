@@ -1,4 +1,5 @@
 <?php include "../inc/database.php" ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -192,17 +193,18 @@
                                         <input type="hidden" name="MaSP" value="<?php echo $row['MaSP']; ?>">
                                         <input type="hidden" name="TenSP" value="<?php echo $row['TenSP']; ?>">
                                         <input type="hidden" name="SoLuong" value="1">
+                                        <input type="hidden" name="Gia" value="
                                         <?php
                                         if ($row['GiaUuDai'] != NULL && $row['GiaUuDai'] > 0) {
                                             $tongTien = $row['GiaUuDai'];
                                         } else {
                                             $tongTien = $row['DonGiaNhap'];
                                         }
-                                        ?>
+                                        ?>">
                                         <input type="hidden" name="TongTien" value="<?php echo $tongTien; ?>">
 
                                         <button type="submit" class="btn" style="display: flex; align-items: center;">
-                                            <a class="btn btn-outline-dark btn-square" href="#"><i
+                                            <a class="btn btn-outline-dark btn-square" href="#" name="add_to_cart"><i
                                                     class="fa fa-shopping-cart"></i></a>
                                             <a class="btn btn-outline-dark btn-square" href="#"><i class="far fa-heart"></i></a>
                                             <a class="btn btn-outline-dark btn-square" href="#"><i
@@ -271,17 +273,18 @@
             </div>
         </div>
     </div>
-    <!-- Offer End -->
+    <!-- Offer End --> 
+     
 
-
-    <div class="container-fluid pt-5 pb-3">
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Sản phẩm
-                gần đây</span></h2>
+            <div class="container-fluid pt-5 pb-3">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+            <span class="bg-secondary pr-3">Sản phẩm Mới Nhất</span>
+        </h2>
         <div class="row px-xl-5">
             <?php
             include "../inc/database.php";
 
-            // Truy vấn sản phẩm mới nhất
+            // Truy vấn sản phẩm nổi bật
             $sql = "SELECT * FROM sanpham ORDER BY MaSP DESC LIMIT 4"; // Lấy 4 sản phẩm mới nhất
             $resultSanPham = $conn->query($sql);
 
@@ -290,33 +293,55 @@
                     <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
                         <div class="product-item bg-light mb-4">
                             <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="../NiceAdmin/img/<?php echo ($row['ANhMH']); ?>" alt="">
-
+                                <img class="img-fluid w-100" src="../NiceAdmin/img/<?php echo $row['ANhMH']; ?>" alt="">
                                 <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
+                                    <form action="add_to_cart.php" method="POST">
+                                        <input type="hidden" name="MaSP" value="<?php echo $row['MaSP']; ?>">
+                                        <input type="hidden" name="TenSP" value="<?php echo $row['TenSP']; ?>">
+                                        <input type="hidden" name="SoLuong" value="1">
+                                        <input type="hidden" name="Gia" value="
+                                        <?php
+                                        if ($row['GiaUuDai'] != NULL && $row['GiaUuDai'] > 0) {
+                                            $tongTien = $row['GiaUuDai'];
+                                        } else {
+                                            $tongTien = $row['DonGiaNhap'];
+                                        }
+                                        ?>">
+                                        <input type="hidden" name="TongTien" value="<?php echo $tongTien; ?>">
+
+                                        <button type="submit" class="btn" style="display: flex; align-items: center;">
+                                            <a class="btn btn-outline-dark btn-square" href="#" name="add_to_cart"><i
+                                                    class="fa fa-shopping-cart"></i></a>
+                                            <a class="btn btn-outline-dark btn-square" href="#"><i class="far fa-heart"></i></a>
+                                            <a class="btn btn-outline-dark btn-square" href="#"><i
+                                                    class="fa fa-sync-alt"></i></a>
+                                            <a class="btn btn-outline-dark btn-square" href="#"><i class="fa fa-search"></i></a>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href=""
+                                <a class="h6 text-decoration-none text-truncate" href="#"
                                     style="max-width: 200px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $row['TenSP']; ?></a>
                                 <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5><?php echo number_format($row['GiaUuDai'] ?? $row['DonGiaNhap'], 0, ',', '.'); ?> VNĐ
-                                    </h5>
-                                    <?php if (!empty($row['GiaUuDai'])): ?>
-                                        <h6 class="text-muted ml-2">
-                                            <del><?php echo number_format($row['DonGiaNhap'], 0, ',', '.'); ?> VNĐ</del>
-                                        </h6>
+                                    <?php
+                                    // Kiểm tra giá ưu đãi và gán giá hiện tại
+                                    if ($row['GiaUuDai'] != NULL && $row['GiaUuDai'] > 0) {
+                                        $giaHienTai = $row['GiaUuDai'];
+                                    } else {
+                                        $giaHienTai = $row['DonGiaNhap'];
+                                    }
+                                    ?>
+                                    <h5><?php echo $giaHienTai; ?> VNĐ</h5>
+                                    <?php if ($row['GiaUuDai'] != NULL && $row['GiaUuDai'] > 0): ?>
+                                        <h6 class="text-muted ml-2"><del><?php echo $row['DonGiaNhap']; ?> VNĐ</del></h6>
                                     <?php endif; ?>
                                 </div>
+
                                 <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <?php for ($i = 0; $i < 5; $i++): ?>
+                                        <small class="fa fa-star text-primary mr-1"></small>
+                                    <?php endfor; ?>
                                     <small>(99)</small>
                                 </div>
                             </div>
@@ -324,11 +349,11 @@
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p>Không có sản phẩm gần đây.</p>
+                <p>Không có sản phẩm.</p>
             <?php endif; ?>
+
         </div>
     </div>
-
 
     <!-- Products End -->
 

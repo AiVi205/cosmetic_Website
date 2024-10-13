@@ -1,138 +1,152 @@
 <?php
 session_start();
-include '../inc/database.php'; // Ensure the path is correct
+ob_start(); // Bắt đầu output buffering
+include "../inc/header.php";
 
-// Check if the user is logged in
-if (!isset($_SESSION['MaND'])) {
-    echo "Bạn cần đăng nhập để xem giỏ hàng.";
-    exit();
+// Kiểm tra giỏ hàng có sản phẩm chưa
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = array();
 }
 
-$MaND = $_SESSION['MaND'];
+// Xử lý thêm sản phẩm
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
+    $product_id = $_POST['MaSP'];
+    $product_name = $_POST['TenSP']; // Tên sản phẩm
+    $product_price = $_POST['DonGiaNhap']; // Giá sản phẩm
+    $found = false;
 
-// Fetch cart items from the database
-$sql = "SELECT giohang.*, sanpham.TenSP, sanpham.DonGiaNhap, sanpham.ANhMH
-        FROM giohang 
-        INNER JOIN sanpham ON giohang.MaSP = sanpham.MaSP 
-        WHERE giohang.MaND = $MaND";
-$result = mysqli_query($conn, $sql);
-
-// Handle quantity updates
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
-    $MaSP = $_POST['MaSP'];
-    $action = $_POST['action'];
-
-    // Update quantity in the cart
-    if ($action === 'increase') {
-        $update_sql = "UPDATE giohang SET SoLuong = SoLuong + 1 WHERE MaND = $MaND AND MaSP = $MaSP";
-    } elseif ($action === 'decrease') {
-        $update_sql = "UPDATE giohang SET SoLuong = GREATEST(SoLuong -1, 0) WHERE MaND = $MaND AND MaSP = $MaSP";
+    // Tìm sản phẩm trong giỏ hàng
+    foreach ($_SESSION['cart'] as &$item) {
+        if ($item['MaSP'] === $product_id) {
+            $item['SoLuong'] += 1; // Tăng số lượng
+            $found = true;
+            break; // Dừng vòng lặp khi đã tìm thấy sản phẩm
+        }
     }
-    mysqli_query($conn, $update_sql);
 
-    // Update total price after modifying quantity
-    $total_sql = "UPDATE giohang 
-                   SET Tongtien = SoLuong * (SELECT DonGiaNhap FROM sanpham WHERE sanpham.MaSP = giohang.MaSP) 
-                   WHERE MaND = $MaND AND MaSP = $MaSP";
-    mysqli_query($conn, $total_sql);
+    // Nếu sản phẩm chưa có trong giỏ hàng, thêm mới
+    if (!$found) {
+        $_SESSION['cart'][] = array(
+            'MaSP' => $product_id,
+            'TenSP' => $product_name,
+            'DonGiaNhap' => $product_price,
+            'SoLuong' => 1
+        );
+    }
 
-    // Reload the cart page to apply changes
+    // Chuyển hướng về trang giỏ hàng
     header("Location: cart.php");
     exit();
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Giỏ Hàng - MultiShop</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <link href="../img/favicon.ico" rel="icon">
-    <link href="../css/style.css" rel="stylesheet">
-</head>
-<body>
-    <?php include "../inc/header.php"; ?>
 
-    <div class="container-fluid">
-        <div class="row px-xl-5">
-            <div class="col-lg-8 table-responsive mb-5">
-                <table class="table table-light table-borderless table-hover text-center mb-0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Products</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                            <th>Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) {
-                            $product_total = $row['DonGiaNhap'] * $row['SoLuong']; ?>
-                            <tr>
-                                <td class="align-middle"><img src="../img/<?php echo $row['ANhMH']; ?>" alt="" style="width: 50px;"> <?php echo $row['TenSP']; ?></td>
-                                <td class="align-middle"><?php echo $row['DonGiaNhap']; ?>VND</td>
-                                <td class="align-middle">
-                                    <form action="" method="POST" style="display: inline;">
-                                        <input type="hidden" name="MaSP" value="<?php echo $row['MaSP']; ?>">
-                                        <div class="input-group quantity mx-auto" style="width: 100px;">
-                                            <div class="input-group-btn">
-                                                <button type="submit" name="action" value="decrease" class="btn btn-sm btn-primary btn-minus"><i class="fa fa-minus"></i></button>
-                                            </div>
-                                            <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="<?php echo $row['SoLuong']; ?>" readonly>
-                                            <div class="input-group-btn">
-                                                <button type="submit" name="action" value="increase" class="btn btn-sm btn-primary btn-plus"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </td>
-                                <td class="align-middle"><?php echo $product_total; ?>VND</td>
-                                <td class="align-middle"><a href="remove_cart_item.php?MaSP=<?php echo $row['MaSP']; ?>" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></a></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-lg-4">
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Cart Summary</span></h5>
-                <div class="bg-light p-30 mb-5">
+// Xử lý tăng giảm số lượng
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $product_id = $_POST['MaSP'];
+    $action = $_POST['action'];
+
+    // Tìm sản phẩm trong giỏ hàng
+    foreach ($_SESSION['cart'] as &$item) {
+        if ($item['MaSP'] === $product_id) {
+            if ($action === 'increase') {
+                $item['SoLuong'] += 1; // Tăng số lượng
+            } elseif ($action === 'decrease') {
+                if ($item['SoLuong'] > 1) {
+                    $item['SoLuong'] -= 1; // Giảm số lượng
+                }
+            }
+            break; // Dừng vòng lặp khi đã tìm thấy sản phẩm
+        }
+    }
+    // Chuyển hướng về trang giỏ hàng
+    header("Location: cart.php");
+    exit();
+}
+
+// Hiển thị giỏ hàng
+?>
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-lg-8 table-responsive mb-5">
+            <?php 
+            if (empty($_SESSION['cart'])) {
+                echo "<div class='container'><h2>Giỏ hàng của bạn đang trống.</h2></div>";
+                $total = 0; // Khởi tạo tổng bằng 0 khi giỏ hàng trống
+            } else {
+                echo "<h2 class='mb-4'>Giỏ hàng của bạn</h2>";
+                echo "<table class='table table-light table-borderless table-hover text-center mb-0'>";
+                echo "<thead class='thead-dark'><tr><th>ID</th><th>Tên sản phẩm</th><th>Giá</th><th>Số lượng</th><th>Tổng tiền</th><th>Thao tác</th></tr></thead><tbody>";
+
+                $total = 0; // Khởi tạo biến tổng
+                foreach ($_SESSION['cart'] as $item) {
+                    // Tính tổng tiền cho mỗi sản phẩm (Giá * Số lượng)
+                    $item_total = $item['DonGiaNhap'] * $item['SoLuong'];
+
+                    echo "<tr>";
+                    echo "<td>" . $item['MaSP'] . "</td>";
+                    echo "<td>" . $item['TenSP'] . "</td>";
+                    echo "<td>" . number_format($item['DonGiaNhap']) . " VNĐ</td>";
+                    echo "<td>
+                             <form action='' method='POST' style='display:inline-flex; align-items: center;'>
+                                <input type='hidden' name='MaSP' value='" . $item['MaSP'] . "'>
+                                <button type='submit' name='action' value='decrease' class='btn btn-sm btn-primary mx-1' style='width: 30px;'>-</button>
+                                <input type='text' name='SoLuong' value='" . $item['SoLuong'] . "' readonly style='width: 40px; text-align: center;' class='form-control mx-1'>
+                                <button type='submit' name='action' value='increase' class='btn btn-sm btn-primary mx-1' style='width: 30px;'>+</button>
+                            </form>
+                          </td>";
+                    echo "<td>" . number_format($item_total) . " VNĐ</td>";
+                    echo "<td><a href='remove_cart_item.php?MaSP=" . $item['MaSP'] . "' class='btn btn-sm btn-danger'><i class='fa fa-times'></i></a></td>";
+                    echo "</tr>";
+
+                    // Cộng tổng tiền cho tất cả các sản phẩm trong giỏ hàng
+                    $total += $item_total;
+                }
+
+                echo "<tr><td colspan='4'>Tổng cộng</td><td>" . number_format($total) . " VNĐ</td><td></td></tr>";
+                echo "</tbody></table>";
+            }
+            ?>
+        </div>
+        
+        <!-- Phần tóm tắt giỏ hàng -->
+        <div class="col-lg-4">
+            <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Tóm tắt giỏ hàng</span></h5>
+            <div class="bg-light p-30 mb-5">
+                <?php if (!empty($_SESSION['cart'])): ?>
                     <div class="border-bottom pb-2">
                         <div class="d-flex justify-content-between mb-3">
                             <h6>Tổng phụ</h6>
                             <h6>
                                 <?php
-                                $total_sql = "SELECT SUM(sanpham.DonGiaNhap * giohang.SoLuong) AS subtotal 
-                                              FROM giohang, sanpham 
-                                              WHERE giohang.MaSP = sanpham.MaSP 
-                                              AND giohang.MaND = $MaND";
-                                $total_result = mysqli_query($conn, $total_sql);
-                                $subtotal = 0; // Default value
-                                if ($row = mysqli_fetch_assoc($total_result)) {
-                                    $subtotal = $row['subtotal']; // Assign value if result exists
-                                }
-                                echo $subtotal;
+                                $subtotal = $total; // Sử dụng tổng từ giỏ hàng
+                                echo number_format($subtotal); 
                                 ?>
                             </h6>
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Vận chuyển</h6>
-                            <h6 class="font-weight-medium">30000VNĐ</h6>
+                            <h6 class="font-weight-medium">30,000 VNĐ</h6>
                         </div>
                     </div>
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Tổng tiền</h5>
-                            <h5><?php echo $subtotal + 30000; ?> VNĐ</h5>
+                            <h5><?php echo number_format(($subtotal) + 30000); ?> VNĐ</h5>
                         </div>
                         <a href="checkout.php">
                             <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Tiến hành thanh toán</button>
                         </a>
                     </div>
-                </div>
+                <?php else: ?>
+                    <div class="border-bottom pb-2">
+                        <h6>Không có sản phẩm nào trong giỏ hàng.</h6>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
+</div>
 
-    <?php include "../inc/footer.php"; ?>
-</body>
-</html>
+<?php
+ob_end_flush(); // Kết thúc output buffering
+include "../inc/footer.php";
+?>
