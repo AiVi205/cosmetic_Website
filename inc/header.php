@@ -2,6 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start(); // Bắt đầu session nếu chưa có
 }
+
+ob_start(); // Bắt đầu output buffering
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,6 +108,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             <a href="#" class="nav-item nav-link">Tin tức</a>
                             <a href="contact.php" class="nav-item nav-link">Liên hệ</a>
                         </div>
+
                         <script>
                             function handleUserClick(event) {
                                 event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
@@ -142,14 +145,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
                             <!-- // Trong file header.php hoặc file bất kỳ có giỏ hàng -->
                             <?php
-                            // $total_quantity = 0; // Khởi tạo biến đếm số lượng
+                            $total_quantity = 0; // Khởi tạo biến đếm số lượng
                             
-                            // Đếm số lượng sản phẩm trong giỏ hàng
-                            // if (isset($_SESSION['cart'])) {
-                            //     foreach ($_SESSION['cart'] as $quantity) {
-                            //         $total_quantity += $quantity; // Cộng dồn số lượng
-                            //     }
-                            // }
+                            //Đếm số lượng sản phẩm trong giỏ hàng
+                            if (isset($_SESSION['cart'])) {
+                                foreach ($_SESSION['cart'] as $item) {
+                                    $total_quantity += $item['SoLuong']; // Cộng dồn số lượng
+                                }
+                            }
                             ?>
 
                             <!-- Hiển thị số lượng trong icon giỏ hàng -->
@@ -158,7 +161,8 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <span class="badge text-secondary border border-secondary rounded-circle"
                                     style="padding-bottom: 2px;">
                                     <?php 
-                                    //echo $total_quantity; ?> <!-- Hiển thị số lượng giỏ hàng -->
+                                    echo $total_quantity; // Hiển thị số lượng giỏ hàng 
+                                    ?>
                                 </span>
                             </a>
 
@@ -169,8 +173,6 @@ if (session_status() === PHP_SESSION_NONE) {
         </div>
     </div>
     <!-- Navbar End -->
-
-    </div>
 </body>
 
 </html>
