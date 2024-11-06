@@ -1,24 +1,24 @@
 <?php
 session_start();
 ob_start(); // Bắt đầu output buffering
-include "../inc/header.php";
+include "../inc/header.php"; // Bao gồm file header (phần đầu trang)
 
-// Kiểm tra giỏ hàng có sản phẩm chưa
+// Kiểm tra xem giỏ hàng đã được khởi tạo hay chưa
 if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = array();
+    $_SESSION['cart'] = array(); // Nếu chưa có giỏ hàng, tạo một mảng rỗng cho giỏ hàng
 }
 
-// Xử lý thêm sản phẩm
+// Xử lý khi thêm sản phẩm vào giỏ hàng
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
     $product_id = $_POST['MaSP'];
     $product_name = $_POST['TenSP']; // Tên sản phẩm
     $product_price = $_POST['DonGiaNhap']; // Giá sản phẩm
     $found = false;
 
-    // Tìm sản phẩm trong giỏ hàng
+    // Tìm kiếm sản phẩm trong giỏ hàng
     foreach ($_SESSION['cart'] as &$item) {
         if ($item['MaSP'] === $product_id) {
-            $item['SoLuong'] += 1; // Tăng số lượng
+            $item['SoLuong'] += 1; // Nếu tìm thấy, tăng số lượng sản phẩm
             $found = true;
             break; // Dừng vòng lặp khi đã tìm thấy sản phẩm
         }
@@ -34,30 +34,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         );
     }
 
-    // Chuyển hướng về trang giỏ hàng
+    // Chuyển hướng lại về trang giỏ hàng sau khi thêm sản phẩm
     header("Location: cart.php");
     exit();
 }
 
-// Xử lý tăng giảm số lượng
+// Xử lý tăng giảm số lượng sản phẩm trong giỏ hàng
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $product_id = $_POST['MaSP'];
     $action = $_POST['action'];
 
-    // Tìm sản phẩm trong giỏ hàng
+    // Tìm sản phẩm trong giỏ hàng để điều chỉnh số lượng
     foreach ($_SESSION['cart'] as &$item) {
         if ($item['MaSP'] === $product_id) {
             if ($action === 'increase') {
-                $item['SoLuong'] += 1; // Tăng số lượng
+                $item['SoLuong'] += 1; // Tăng số lượng sản phẩm
             } elseif ($action === 'decrease') {
                 if ($item['SoLuong'] > 1) {
-                    $item['SoLuong'] -= 1; // Giảm số lượng
+                    $item['SoLuong'] -= 1; // Giảm số lượng sản phẩm
                 }
             }
             break; // Dừng vòng lặp khi đã tìm thấy sản phẩm
         }
     }
-    // Chuyển hướng về trang giỏ hàng
+
+    // Chuyển hướng lại về trang giỏ hàng sau khi điều chỉnh số lượng
     header("Location: cart.php");
     exit();
 }
@@ -76,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo "<table class='table table-light table-borderless table-hover text-center mb-0'>";
                 echo "<thead class='thead-dark'><tr><th>ID</th><th>Tên sản phẩm</th><th>Giá</th><th>Số lượng</th><th>Tổng tiền</th><th>Thao tác</th></tr></thead><tbody>";
 
-                $total = 0; // Khởi tạo biến tổng
+                $total = 0; // Khởi tạo biến tổng tiền
                 foreach ($_SESSION['cart'] as $item) {
                     // Tính tổng tiền cho mỗi sản phẩm (Giá * Số lượng)
                     $item_total = $item['DonGiaNhap'] * $item['SoLuong'];
@@ -101,7 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $total += $item_total;
                 }
 
-               // echo "<tr><td colspan='4'>Tổng cộng</td><td>" . number_format($total) . " VNĐ</td><td></td></tr>";
                 echo "</tbody></table>";
             }
             ?>
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <h6>Tổng phụ</h6>
                             <h6>
                                 <?php
-                                $subtotal = $total; // Sử dụng tổng từ giỏ hàng
+                                $subtotal = $total; // Tổng phụ từ giỏ hàng
                                 echo number_format($subtotal); 
                                 ?>
                             </h6>
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <h5>Tổng tiền</h5>
                             <h5><?php echo number_format(($subtotal) + 30000); ?> VNĐ</h5>
                         </div>
-                        <a href="payment.php">
+                        <a href="checkout.php">
                             <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Tiến hành thanh toán</button>
                         </a>
                     </div>
@@ -148,5 +148,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 <?php
 ob_end_flush(); // Kết thúc output buffering
-include "../inc/footer.php";
+include "../inc/footer.php"; // Bao gồm file footer (phần chân trang)
 ?>
