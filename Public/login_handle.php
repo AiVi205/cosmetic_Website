@@ -45,6 +45,7 @@ if (isset($_POST['Tai_Khoan']) && isset($_POST['your_pass'])) {
 $conn->close();
 ?>
 <?php
+<<<<<<< HEAD
 // session_start(); // Bắt đầu session
 // include "../inc/database.php"; // Kết nối cơ sở dữ liệu
 
@@ -110,3 +111,61 @@ $conn->close();
 // $conn->close(); // Đóng kết nối cơ sở dữ liệu
 ?>
 
+=======
+// session_start();
+// include "../inc/database.php";
+
+// if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//     $Tai_Khoan = $_POST['Tai_Khoan']; // Make sure this matches the correct form input name
+//     $password = $_POST['your_pass']; // Make sure this matches the correct form input name
+
+//     // Correct the column name here
+//     $sql = "SELECT * FROM nguoidung WHERE TaiKhoan = ? AND MatKhau = ?"; // Change 'Email' to the correct column name for email
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bind_param("ss", $Tai_Khoan, $password);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+
+//     if ($result->num_rows > 0) {
+//         $user = $result->fetch_assoc();
+//         $_SESSION['MaND'] = $user['MAND'];
+
+//         // Chuyển giỏ hàng từ session vào cơ sở dữ liệu nếu có
+//         if (isset($_SESSION['cart'])) {
+//             foreach ($_SESSION['cart'] as $product_id => $details) {
+//                 $quantity = $details['SoLuong'];
+
+//                 // Kiểm tra nếu sản phẩm đã tồn tại trong giỏ hàng
+//                 $sql = "SELECT * FROM giohang WHERE MaND = ? AND MaSP = ?";
+//                 $stmt = $conn->prepare($sql);
+//                 $stmt->bind_param("ii", $_SESSION['MaND'], $product_id);
+//                 $stmt->execute();
+//                 $result = $stmt->get_result();
+
+//                 if ($result->num_rows > 0) {
+//                     // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
+//                     $sql = "UPDATE giohang SET SoLuong = SoLuong + ? WHERE MAND = ? AND MASP = ?";
+//                     $stmt = $conn->prepare($sql);
+//                     $stmt->bind_param("iii", $quantity, $_SESSION['MAND'], $product_id);
+//                 } else {
+//                     // Thêm sản phẩm mới vào giỏ hàng
+//                     $sql = "INSERT INTO giohang (MaND, MaSP, SoLuong) VALUES (?, ?, ?)";
+//                     $stmt = $conn->prepare($sql);
+//                     $stmt->bind_param("iii", $_SESSION['MaND'], $product_id, $quantity);
+//                 }
+//                 $stmt->execute();
+//             }
+//             // Xóa giỏ hàng session sau khi chuyển vào DB
+//             unset($_SESSION['cart']);
+//         }
+
+//         header("Location: index.php");
+//         exit();
+//     } else {
+//         echo "Invalid email or password";
+//     }
+// }
+?>
+
+
+>>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
