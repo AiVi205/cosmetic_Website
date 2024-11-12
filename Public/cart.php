@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 <div class="container-fluid">
     <div class="row px-xl-5">
         <div class="col-lg-8 table-responsive mb-5">
-<<<<<<< HEAD
             <?php 
             if (empty($_SESSION['cart'])) {
                 echo "<div class='container'><h2>Giỏ hàng của bạn đang trống.</h2></div>";
@@ -115,7 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo "</tbody></table>";
             }
             ?>
-=======
             <?php if (!empty($cart_items)): ?>
                 <h2 class="mb-4">Giỏ hàng của bạn</h2>
                 <table class="table table-light table-borderless table-hover text-center mb-0">
@@ -161,7 +159,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <?php else: ?>
                 <p>Giỏ hàng của bạn trống.</p>
             <?php endif; ?>
->>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
         </div>
         
         <!-- Phần tóm tắt giỏ hàng -->
@@ -184,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <h5>Tổng tiền</h5>
                             <h5><?php echo number_format($total + 30000); ?> VNĐ</h5>
                         </div>
-                        <a href="payment.php">
+                        <a href="checkout.php">
                             <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Tiến hành thanh toán</button>
                         </a>
                     </div>
