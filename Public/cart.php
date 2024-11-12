@@ -2,7 +2,6 @@
 session_start();
 include "../inc/database.php";
 include '../inc/header.php';
-
 $cart_items = [];
 
 if (isset($_SESSION['MaND'])) {
