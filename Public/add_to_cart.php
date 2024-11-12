@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
 <?php
 session_start();
 include "../inc/database.php";
@@ -49,6 +53,14 @@ if (isset($_SESSION['MaND'])) {
     }
 }
 
+<<<<<<< HEAD
+// Đóng kết nối cơ sở dữ liệu
+$stmt->close();
+$conn->close();
+
+
+=======
 header("Location: cart.php");
 exit();
+>>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
 ?>

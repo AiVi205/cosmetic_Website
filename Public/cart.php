@@ -76,6 +76,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 <div class="container-fluid">
     <div class="row px-xl-5">
         <div class="col-lg-8 table-responsive mb-5">
+<<<<<<< HEAD
+            <?php 
+            if (empty($_SESSION['cart'])) {
+                echo "<div class='container'><h2>Giỏ hàng của bạn đang trống.</h2></div>";
+                $total = 0; // Khởi tạo tổng bằng 0 khi giỏ hàng trống
+            } else {
+                echo "<h2 class='mb-4'>Giỏ hàng của bạn</h2>";
+                echo "<table class='table table-light table-borderless table-hover text-center mb-0'>";
+                echo "<thead class='thead-dark'><tr><th>ID</th><th>Tên sản phẩm</th><th>Giá</th><th>Số lượng</th><th>Tổng tiền</th><th>Thao tác</th></tr></thead><tbody>";
+
+                $total = 0; // Khởi tạo biến tổng
+                foreach ($_SESSION['cart'] as $item) {
+                    // Tính tổng tiền cho mỗi sản phẩm (Giá * Số lượng)
+                    $item_total = $item['DonGiaNhap'] * $item['SoLuong'];
+
+                    echo "<tr>";
+                    echo "<td>" . $item['MaSP'] . "</td>";
+                    echo "<td>" . $item['TenSP'] . "</td>";
+                    echo "<td>" . number_format($item['DonGiaNhap']) . " VNĐ</td>";
+                    echo "<td>
+                             <form action='' method='POST' style='display:inline-flex; align-items: center;'>
+                                <input type='hidden' name='MaSP' value='" . $item['MaSP'] . "'>
+                                <button type='submit' name='action' value='decrease' class='btn btn-sm btn-primary mx-1' style='width: 30px;'>-</button>
+                                <input type='text' name='SoLuong' value='" . $item['SoLuong'] . "' readonly style='width: 40px; text-align: center;' class='form-control mx-1'>
+                                <button type='submit' name='action' value='increase' class='btn btn-sm btn-primary mx-1' style='width: 30px;'>+</button>
+                            </form>
+                          </td>";
+                    echo "<td>" . number_format($item_total) . " VNĐ</td>";
+                    echo "<td><a href='remove_cart_item.php?MaSP=" . $item['MaSP'] . "' class='btn btn-sm btn-danger'><i class='fa fa-times'></i></a></td>";
+                    echo "</tr>";
+
+                    // Cộng tổng tiền cho tất cả các sản phẩm trong giỏ hàng
+                    $total += $item_total;
+                }
+
+               // echo "<tr><td colspan='4'>Tổng cộng</td><td>" . number_format($total) . " VNĐ</td><td></td></tr>";
+                echo "</tbody></table>";
+            }
+            ?>
+=======
             <?php if (!empty($cart_items)): ?>
                 <h2 class="mb-4">Giỏ hàng của bạn</h2>
                 <table class="table table-light table-borderless table-hover text-center mb-0">
@@ -121,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <?php else: ?>
                 <p>Giỏ hàng của bạn trống.</p>
             <?php endif; ?>
+>>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
         </div>
         
         <!-- Phần tóm tắt giỏ hàng -->
@@ -143,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <h5>Tổng tiền</h5>
                             <h5><?php echo number_format($total + 30000); ?> VNĐ</h5>
                         </div>
-                        <a href="checkout.php">
+                        <a href="payment.php">
                             <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Tiến hành thanh toán</button>
                         </a>
                     </div>
