@@ -4,6 +4,35 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 ob_start(); // Bắt đầu output buffering
+
+include "../inc/database.php"; // Đảm bảo kết nối database có sẵn nếu cần
+
+// Biến lưu tổng số lượng sản phẩm trong giỏ hàng
+$total_quantity = 0;
+
+if (isset($_SESSION['MaND'])) {
+    // Nếu người dùng đã đăng nhập, lấy số lượng sản phẩm từ cơ sở dữ liệu
+    $user_id = $_SESSION['MaND'];
+    $sql = "SELECT SUM(SoLuong) as total_quantity FROM giohang WHERE MaND = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    if ($row) {
+        $total_quantity = $row['total_quantity'] ?: 0; // Nếu không có sản phẩm thì số lượng là 0
+    }
+
+    $stmt->close();
+} else {
+    // Nếu người dùng chưa đăng nhập, lấy số lượng sản phẩm từ session
+    if (isset($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $item) {
+            $total_quantity += $item['SoLuong']; // Cộng dồn số lượng sản phẩm trong session
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,12 +62,12 @@ ob_start(); // Bắt đầu output buffering
 
 <body>
     <div class="container-fluid">
-
         <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
             <div class="col-lg-4">
                 <a href="" class="text-decoration-none">
-                    <span class="h1 text-uppercase text-primary bg-dark px-2">Multi</span>
-                    <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">Shop</span>
+                    <!-- <img src="../img/logo1.jpg" width="25%" > -->
+                    <span class="h2 text-uppercase text-primary bg-dark px-2">LoFi</span> 
+                    <span class="h2 text-uppercase text-dark bg-primary px-2 ml-n1">Shop</span>
                 </a>
             </div>
 
@@ -70,24 +99,11 @@ ob_start(); // Bắt đầu output buffering
                 <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
                     id="navbar-vertical" style="width: calc(100% - 30px); z-index: 999;">
                     <div class="navbar-nav w-100">
-                        <div class="nav-item dropdown dropright">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Dresses <i
-                                    class="fa fa-angle-right float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute rounded-0 border-0 m-0">
-                                <a href="" class="dropdown-item">Men's Dresses</a>
-                                <a href="" class="dropdown-item">Women's Dresses</a>
-                                <a href="" class="dropdown-item">Baby's Dresses</a>
-                            </div>
-                        </div>
-                        <a href="" class="nav-item nav-link">Shirts</a>
-                        <a href="" class="nav-item nav-link">Jeans</a>
-                        <a href="" class="nav-item nav-link">Swimwear</a>
-                        <a href="" class="nav-item nav-link">Sleepwear</a>
-                        <a href="" class="nav-item nav-link">Sportswear</a>
-                        <a href="" class="nav-item nav-link">Jumpsuits</a>
-                        <a href="" class="nav-item nav-link">Blazers</a>
-                        <a href="" class="nav-item nav-link">Jackets</a>
-                        <a href="" class="nav-item nav-link">Shoes</a>
+                        <!-- Danh sách sản phẩm hoặc danh mục -->
+                        <a href="#" class="nav-item nav-link">Dresses</a>
+                        <a href="#" class="nav-item nav-link">Shirts</a>
+                        <a href="#" class="nav-item nav-link">Jeans</a>
+                        <a href="#" class="nav-item nav-link">Jackets</a>
                     </div>
                 </nav>
             </div>
@@ -104,8 +120,7 @@ ob_start(); // Bắt đầu output buffering
                         <div class="navbar-nav mr-auto py-0">
                             <a href="index.php" class="nav-item nav-link">Trang chủ</a>
                             <a href="#" class="nav-item nav-link">Giới thiệu</a>
-                            <a href="Shop.php" class="nav-item nav-link">Sản phẩm</a>
-                            <a href="#" class="nav-item nav-link">Tin tức</a>
+                            <a href="shop.php" class="nav-item nav-link">Sản phẩm</a>
                             <a href="contact.php" class="nav-item nav-link">Liên hệ</a>
                         </div>
 
@@ -142,18 +157,6 @@ ob_start(); // Bắt đầu output buffering
                                     <span class="text-light">Đăng nhập</span>
                                 <?php endif; ?>
                             </a>
-
-                            <!-- // Trong file header.php hoặc file bất kỳ có giỏ hàng -->
-                            <?php
-                            $total_quantity = 0; // Khởi tạo biến đếm số lượng
-                            
-                            //Đếm số lượng sản phẩm trong giỏ hàng
-                            if (isset($_SESSION['cart'])) {
-                                foreach ($_SESSION['cart'] as $item) {
-                                    $total_quantity += $item['SoLuong']; // Cộng dồn số lượng
-                                }
-                            }
-                            ?>
 
                             <!-- Hiển thị số lượng trong icon giỏ hàng -->
                             <a href="cart.php" class="btn px-0 ml-3">

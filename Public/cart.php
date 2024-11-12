@@ -108,7 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                     </form>
                                 </td>
                                 <td><?php echo number_format($item_total); ?> VNĐ</td>
-                                <td><a href="remove_cart_item.php?MaSP=<?php echo $item['MaSP']; ?>" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></a></td>
+                                <td>
+                                    <form action="remove_cart_item.php" method="POST">
+                                        <input type="hidden" name="MaSP" value="<?php echo $item['MaSP']; ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button>
+                                    </form>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
