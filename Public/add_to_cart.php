@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
 <?php
 session_start();
 include "../inc/database.php";
@@ -41,6 +37,7 @@ if (isset($_SESSION['MaND'])) {
 
     $product_id = $_POST['MaSP'];
     $quantity = $_POST['SoLuong'];
+    $Price = $_POST['Gia'];  // You need to fetch the price for guest carts
 
     // Kiểm tra sản phẩm đã có trong giỏ hàng hay chưa
     if (isset($_SESSION['cart'][$product_id])) {
@@ -48,19 +45,14 @@ if (isset($_SESSION['MaND'])) {
     } else {
         $_SESSION['cart'][$product_id] = array(
             'MaSp' => $product_id,
-            'SoLuong' => $quantity
+            'SoLuong' => $quantity,
+            'Gia' => $Price  // Add the price to the session for non-logged-in users
         );
     }
+    // Không cần đóng statement ở đây vì không có statement cho khách
 }
 
-<<<<<<< HEAD
-// Đóng kết nối cơ sở dữ liệu
-$stmt->close();
-$conn->close();
-
-
-=======
+// Redirect to cart page after adding to cart
 header("Location: cart.php");
 exit();
->>>>>>> 95795826f5d07d1087570b714babc47f4f9ba81b
 ?>
