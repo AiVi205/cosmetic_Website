@@ -30,6 +30,14 @@
                                 <input type="email" name="email" id="email" placeholder="Email" required/>
                             </div>
                             <div class="form-group">
+                                <label for="CCCD"><i class="fas fa-envelope"></i></label>
+                                <input type="CCCD" name="CCCD" id="CCCD" placeholder="CCCD" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="SDT"><i class="fas fa-envelope"></i></label>
+                                <input type="SDT" name="SDT" id="SDT" placeholder="SDT" required/>
+                            </div>
+                            <div class="form-group">
                                 <label for="pass"><i class="fa fa-unlock-alt"></i></label>
                                 <input type="password" name="pass" id="pass" placeholder="Mật khẩu" required/>
                             </div>
