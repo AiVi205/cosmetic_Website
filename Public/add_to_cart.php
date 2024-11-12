@@ -2,6 +2,7 @@
 session_start();
 include "../inc/database.php";
 
+
 // Kiểm tra xem người dùng đã đăng nhập chưa
 if (isset($_SESSION['MaND'])) {
     $user_id = $_SESSION['MaND'];
