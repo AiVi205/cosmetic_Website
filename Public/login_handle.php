@@ -1,6 +1,5 @@
 <?php
 session_start(); // Bắt đầu session
-
 include "../inc/database.php";
 
 if (isset($_POST['Tai_Khoan']) && isset($_POST['your_pass'])) {
